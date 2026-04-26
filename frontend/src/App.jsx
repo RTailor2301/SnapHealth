@@ -23,14 +23,21 @@ function App() {
     <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)", fontFamily: "var(--font-body)" }}>
 
       <header className="sticky top-0 z-20" style={{ background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}>
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold leading-tight tracking-tight" style={{ fontFamily: "var(--font-display)", color: "var(--accent)" }}>
-              SnapHealth
-            </h1>
-            <p className="text-xs mt-0.5" style={{ color: "var(--muted)", fontFamily: "var(--font-mono)" }}>
-              {t(language, "app.tagline")}
-            </p>
+        <div className="max-w-xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img
+              src="/snaphealthlogo.png"
+              alt="SnapHealth logo"
+              style={{ height: "40px", width: "auto", display: "block", flexShrink: 0 }}
+            />
+            <div>
+              <h1 className="text-xl font-bold leading-tight tracking-tight" style={{ fontFamily: "var(--font-display)", color: "var(--accent)" }}>
+                SnapHealth
+              </h1>
+              <p className="text-xs mt-0.5" style={{ color: "var(--muted)", fontFamily: "var(--font-mono)" }}>
+                {t(language, "app.tagline")}
+              </p>
+            </div>
           </div>
           <select
             value={language}
@@ -46,7 +53,7 @@ function App() {
           </select>
         </div>
 
-        <div className="px-4 py-1.5 text-center border-t" style={{ background: "#f0fdf9", borderColor: "#99f6e4" }}>
+        <div className="mx-auto px-4 py-1.5 text-center border-t" style={{ background: "#f0fdf9", borderColor: "#99f6e4" }}>
           <p className="text-xs" style={{ color: "#065f46", fontFamily: "var(--font-mono)" }}>
             {t(language, "app.privacy_banner")}
           </p>
