@@ -66,20 +66,12 @@ def analyze_body(image_b64: str, description: str, language: str, history: list[
     profile_block = f"\n\n{profile_context}" if profile_context else ""
     user_text = f"Language: {language}\n{profile_block}\n\nUser description: {description}" if description else f"Language: {language}{profile_block}"
 
-    image_message = {
-        "role": "user",
-        "content": [
-            {
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": "image/jpeg",
-                    "data": image_b64,
-                },
-            },
-            {"type": "text", "text": user_text},
-        ],
-    }
+    content: list = []
+    if image_b64:
+        content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": image_b64}})
+    content.append({"type": "text", "text": user_text})
+
+    image_message = {"role": "user", "content": content}
     trimmed = _trim_history(history, max_pairs=5)
 
     if trimmed and trimmed[-1]["role"] == "user":
@@ -106,20 +98,12 @@ def analyze_label(image_b64: str, medications: list[str], language: str, history
     profile_block = f"\n\n{profile_context}" if profile_context else ""
     user_text = f"Language: {language}{profile_block}\n\nThis is a medication label image. Other medications the user takes: {med_list}.\n\nPlease decode this label into plain English including: drug name, purpose, dosage instructions, key side effects (3-5 most important), and any drug interactions with the listed medications. Format as JSON matching the schema."
 
-    image_message = {
-        "role": "user",
-        "content": [
-            {
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": "image/jpeg",
-                    "data": image_b64,
-                },
-            },
-            {"type": "text", "text": user_text},
-        ],
-    }
+    content: list = []
+    if image_b64:
+        content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": image_b64}})
+    content.append({"type": "text", "text": user_text})
+
+    image_message = {"role": "user", "content": content}
     trimmed = _trim_history(history, max_pairs=5)
 
     if trimmed and trimmed[-1]["role"] == "user":
