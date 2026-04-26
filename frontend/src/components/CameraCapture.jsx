@@ -105,7 +105,7 @@ export default function CameraCapture({ language, onCapture }) {
 
       {mode === "file" && (
         <div>
-          <input type="file" accept="image/*" capture="environment" ref={fileRef} onChange={handleFileChange} className="hidden" />
+          <input type="file" accept="image/*" ref={fileRef} onChange={handleFileChange} className="hidden" />
           <motion.button
             onClick={() => fileRef.current?.click()}
             whileHover={{ borderColor: "var(--accent)", color: "var(--accent)" }}
