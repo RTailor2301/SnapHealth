@@ -6,7 +6,7 @@ const api = axios.create({ baseURL: BASE_URL });
 
 export async function analyzeBody({ image, description, language, history, profile }) {
   const { data } = await api.post("/analyze/body", {
-    image,
+    image: image ?? "",
     description,
     language,
     history,
@@ -17,7 +17,7 @@ export async function analyzeBody({ image, description, language, history, profi
 
 export async function analyzeLabel({ image, description, medications, language, history, profile }) {
   const { data } = await api.post("/analyze/label", {
-    image,
+    image: image ?? "",
     description,
     medications,
     language,
