@@ -1,0 +1,186 @@
+import { useState } from "react";
+import CameraCapture from "../components/CameraCapture";
+import SeverityBadge from "../components/SeverityBadge";
+import ReasoningAccordion from "../components/ReasoningAccordion";
+import ChatWindow from "../components/ChatWindow";
+import { analyzeLabel } from "../services/api";
+
+export default function AnalyzeLabel({ language, profile }) {
+  const [image, setImage] = useState(null);
+  const [description, setDescription] = useState("");
+  const [medInput, setMedInput] = useState("");
+  const [medications, setMedications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  const hasInput = Boolean(image) || description.trim().length > 0;
+
+  function addMed() {
+    const m = medInput.trim();
+    if (m && !medications.includes(m)) {
+      setMedications([...medications, m]);
+    }
+    setMedInput("");
+  }
+
+  async function handleAnalyze() {
+    if (!hasInput) return;
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const allMeds = [
+        ...medications,
+        ...(profile?.currentMedications || []),
+      ];
+      const data = await analyzeLabel({
+        image,
+        description,
+        medications: [...new Set(allMeds)],
+        language,
+        history: [],
+        profile,
+      });
+      setResult(data);
+    } catch {
+      setError("Unable to reach the analysis service.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const chatHistory = result
+    ? [
+        {
+          role: "user",
+          content: description || "Please decode this medication label",
+        },
+        { role: "assistant", content: result.plain_explanation },
+      ]
+    : [];
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <p className="text-xs text-gray-500 mb-2">
+          Photo is optional — type your medication question below for a text-only answer.
+        </p>
+        <CameraCapture onCapture={setImage} />
+      </div>
+
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Ask about a medication or paste label text (e.g. 'What is amoxicillin used for?')..."
+        rows={3}
+        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+      />
+
+      <div>
+        <p className="text-sm font-semibold text-gray-700 mb-2">
+          Other medications you take (for interaction check):
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={medInput}
+            onChange={(e) => setMedInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addMed()}
+            placeholder="e.g. Metformin"
+            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={addMed}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm"
+          >
+            Add
+          </button>
+        </div>
+        {medications.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {medications.map((m) => (
+              <span
+                key={m}
+                className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center gap-1"
+              >
+                {m}
+                <button
+                  onClick={() => setMedications(medications.filter((x) => x !== m))}
+                  className="text-blue-500 hover:text-blue-800"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <button
+        onClick={handleAnalyze}
+        disabled={!hasInput || loading}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold disabled:opacity-40 transition"
+      >
+        {loading ? "Decoding..." : image ? "Decode Label" : "Ask"}
+      </button>
+
+      {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+
+      {result && (
+        <div className="space-y-4">
+          <SeverityBadge severity={result.severity} severityLabel={result.severity_label} />
+
+          <div className="bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-700">
+            <p>{result.plain_explanation}</p>
+          </div>
+
+          {result.action_steps?.length > 0 && (
+            <div className="bg-white border border-gray-200 rounded-xl p-4 text-sm">
+              <p className="font-semibold text-gray-800 mb-2">Key information:</p>
+              <ul className="space-y-1">
+                {result.action_steps.map((step, i) => (
+                  <li key={i} className="flex gap-2 text-gray-700">
+                    <span className="text-blue-500">→</span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {result.warning_signs?.length > 0 && (
+            <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-sm">
+              <p className="font-semibold text-red-800 mb-2">⚠ Important warnings:</p>
+              <ul className="space-y-1">
+                {result.warning_signs.map((sign, i) => (
+                  <li key={i} className="text-red-700">• {sign}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <ReasoningAccordion
+            reasoning={result.reasoning_transparency}
+            severity={result.severity}
+          />
+
+          <div className="text-xs text-gray-400 text-center border-t border-gray-100 pt-3">
+            {result.disclaimer}
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-gray-700 mb-2">Ask a follow-up:</p>
+            <ChatWindow
+              initialHistory={chatHistory}
+              language={language}
+              profile={profile}
+              disabled={false}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
