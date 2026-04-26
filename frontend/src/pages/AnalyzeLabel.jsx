@@ -3,8 +3,18 @@ import CameraCapture from "../components/CameraCapture";
 import SeverityBadge from "../components/SeverityBadge";
 import ReasoningAccordion from "../components/ReasoningAccordion";
 import ChatWindow from "../components/ChatWindow";
+import MicButton from "../components/MicButton";
+import SpeakButton from "../components/SpeakButton";
 import { analyzeLabel } from "../services/api";
 import { t } from "../i18n";
+
+function buildSpeechText(result) {
+  const parts = [result.plain_explanation];
+  if (result.recommendation_reasoning) parts.push(result.recommendation_reasoning);
+  if (result.action_steps?.length) parts.push("Key information: " + result.action_steps.join(". "));
+  if (result.warning_signs?.length) parts.push("Important warnings: " + result.warning_signs.join(". "));
+  return parts.join(". ");
+}
 
 export default function AnalyzeLabel({ language, profile }) {
   const [image, setImage] = useState(null);
@@ -71,6 +81,21 @@ export default function AnalyzeLabel({ language, profile }) {
         <CameraCapture language={language} onCapture={setImage} />
       </div>
 
+
+      <div className="relative">
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Ask about a medication or paste label text (e.g. 'What is amoxicillin used for?')..."
+          rows={3}
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+        />
+        <MicButton
+          onTranscript={(t) => setDescription((prev) => prev ? prev + " " + t : t)}
+          lang={language}
+          className="absolute bottom-2 right-2 w-8 h-8"
+        />
+      </div>
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
@@ -78,6 +103,7 @@ export default function AnalyzeLabel({ language, profile }) {
         rows={3}
         className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
       />
+
 
       <div>
         <p className="text-sm font-semibold text-gray-700 mb-2">
@@ -135,6 +161,12 @@ export default function AnalyzeLabel({ language, profile }) {
 
       {result && (
         <div className="space-y-4">
+
+          <div className="flex items-center justify-between gap-3">
+            <SeverityBadge severity={result.severity} severityLabel={result.severity_label} />
+            <SpeakButton text={buildSpeechText(result)} />
+          </div>
+
           <SeverityBadge
             language={language}
             severity={result.severity}
