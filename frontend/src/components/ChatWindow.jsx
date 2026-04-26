@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { sendChat } from "../services/api";
-
 import MicButton from "./MicButton";
 import SpeakButton from "./SpeakButton";
 import { t } from "../i18n";
-
+import { safeSpring } from "../motion";
 
 export default function ChatWindow({ initialHistory, language, profile, disabled }) {
   const [messages, setMessages] = useState(initialHistory || []);
@@ -27,55 +27,86 @@ export default function ChatWindow({ initialHistory, language, profile, disabled
     setLoading(true);
 
     try {
-      const response = await sendChat({
-        history: updated,
-        message: text,
-        language,
-        profile,
-      });
+      const response = await sendChat({ history: updated, message: text, language, profile });
       setMessages([...updated, { role: "assistant", content: response }]);
     } catch {
-      setMessages([
-        ...updated,
-        {
-          role: "assistant",
-          content: t(language, "chat.error"),
-        },
-      ]);
+      setMessages([...updated, { role: "assistant", content: t(language, "chat.error") }]);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col h-72">
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-gray-50">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`text-sm rounded-lg px-3 py-2 max-w-xs ${
-              m.role === "user"
-                ? "ml-auto bg-blue-600 text-white"
-                : "mr-auto bg-white border border-gray-200 text-gray-800"
-            }`}
-          >
-            {m.content}
-            {m.role === "assistant" && (
-              <div className="mt-1">
-                <SpeakButton text={m.content} />
+    <div
+      className="flex flex-col overflow-hidden"
+      style={{
+        border: "1px solid rgba(100,116,139,0.2)",
+        borderRadius: "var(--radius-lg)",
+        background: "var(--surface)",
+        boxShadow: "var(--shadow-sm)",
+        height: "18rem",
+      }}
+    >
+      {/* Message list */}
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3" style={{ background: "var(--bg)" }}>
+        <AnimatePresence initial={false}>
+          {messages.map((m, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className={`text-sm max-w-xs ${m.role === "user" ? "ml-auto" : "mr-auto"}`}
+            >
+              <div
+                className="px-3 py-2"
+                style={{
+                  borderRadius: m.role === "user" ? "var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg)" : "var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm)",
+                  background: m.role === "user" ? "var(--accent)" : "var(--surface)",
+                  color: m.role === "user" ? "#fff" : "var(--text)",
+                  border: m.role === "user" ? "none" : "1px solid rgba(100,116,139,0.15)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-sm)",
+                  lineHeight: 1.6,
+                  boxShadow: "var(--shadow-sm)",
+                }}
+              >
+                {m.content}
               </div>
-            )}
-          </div>
-        ))}
+              {m.role === "assistant" && (
+                <div className="mt-1 pl-1">
+                  <SpeakButton text={m.content} />
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
         {loading && (
-          <div className="mr-auto bg-white border border-gray-200 text-gray-400 text-sm rounded-lg px-3 py-2 animate-pulse">
-            {t(language, "chat.thinking")}
+          <div className="mr-auto">
+            <div
+              className="px-3 py-2 text-sm animate-pulse"
+              style={{
+                borderRadius: "var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm)",
+                background: "var(--surface)",
+                border: "1px solid rgba(100,116,139,0.15)",
+                color: "var(--muted)",
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-sm)",
+              }}
+            >
+              {t(language, "chat.thinking")}
+            </div>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      <div className="flex items-center gap-2 px-3 py-2 bg-white border-t border-gray-200">
+      {/* Input bar */}
+      <div
+        className="flex items-center gap-2 px-3 py-2 border-t"
+        style={{ background: "var(--surface)", borderColor: "rgba(100,116,139,0.12)" }}
+      >
         <input
           type="text"
           value={input}
@@ -83,19 +114,40 @@ export default function ChatWindow({ initialHistory, language, profile, disabled
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder={disabled ? t(language, "chat.disabled_placeholder") : t(language, "chat.placeholder")}
           disabled={disabled}
-          className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+          className="flex-1 text-sm px-3 py-2 border transition"
+          style={{
+            borderRadius: "var(--radius-md)",
+            borderColor: "rgba(100,116,139,0.3)",
+            color: "var(--text)",
+            background: disabled ? "var(--bg)" : "var(--surface)",
+            fontFamily: "var(--font-body)",
+            fontSize: "var(--text-sm)",
+            minHeight: "44px",
+            outline: "none",
+          }}
+          onFocus={(e) => (e.target.style.boxShadow = "0 0 0 2px var(--accent)")}
+          onBlur={(e) => (e.target.style.boxShadow = "none")}
         />
-        <MicButton
-          onTranscript={(t) => setInput(t)}
-          className="w-8 h-8 shrink-0"
-        />
-        <button
+        <MicButton onTranscript={(t) => setInput(t)} className="w-10 h-10 shrink-0" />
+        <motion.button
           onClick={handleSend}
           disabled={loading || disabled || !input.trim()}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded-lg disabled:opacity-40 transition"
+          whileHover={{ boxShadow: "var(--shadow-accent)" }}
+          whileTap={{ scale: 0.97 }}
+          transition={safeSpring}
+          className="text-sm font-medium text-white px-4 shrink-0"
+          style={{
+            background: "var(--accent)",
+            borderRadius: "var(--radius-md)",
+            border: "none",
+            fontFamily: "var(--font-body)",
+            minHeight: "44px",
+            cursor: loading || disabled || !input.trim() ? "not-allowed" : "pointer",
+            opacity: loading || disabled || !input.trim() ? 0.4 : 1,
+          }}
         >
           {t(language, "chat.send")}
-        </button>
+        </motion.button>
       </div>
     </div>
   );

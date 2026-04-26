@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import AnalyzeBody from "./pages/AnalyzeBody";
 import AnalyzeLabel from "./pages/AnalyzeLabel";
 import Profile from "./pages/Profile";
 import { useProfile } from "./hooks/useProfile";
 import { t } from "./i18n";
+import { pageVariants, safeSpring } from "./motion";
 
 const TAB_IDS = ["body", "label", "profile"];
 
@@ -18,67 +20,81 @@ function App() {
   const { profile, updateProfile, clearProfile, loaded } = useProfile();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)", fontFamily: "var(--font-body)" }}>
+
+      <header className="sticky top-0 z-20" style={{ background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}>
+        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-blue-700 leading-tight">SnapHealth</h1>
-            <p className="text-xs text-gray-400">{t(language, "app.tagline")}</p>
+            <h1 className="text-xl font-bold leading-tight tracking-tight" style={{ fontFamily: "var(--font-display)", color: "var(--accent)" }}>
+              SnapHealth
+            </h1>
+            <p className="text-xs mt-0.5" style={{ color: "var(--muted)", fontFamily: "var(--font-mono)" }}>
+              {t(language, "app.tagline")}
+            </p>
           </div>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-sm px-3 py-2 border transition"
+            style={{ borderRadius: "var(--radius-md)", borderColor: "var(--muted)", color: "var(--text)", background: "var(--surface)", fontFamily: "var(--font-body)", minHeight: "44px", outline: "none" }}
+            onFocus={(e) => (e.target.style.boxShadow = "0 0 0 2px var(--accent)")}
+            onBlur={(e) => (e.target.style.boxShadow = "none")}
           >
             {LANGUAGES.map((l) => (
               <option key={l.value} value={l.value}>{l.label}</option>
             ))}
           </select>
         </div>
-        <div className="bg-green-50 border-t border-green-100 px-4 py-1 text-center">
-          <p className="text-xs text-green-700">
+
+        <div className="px-4 py-1.5 text-center border-t" style={{ background: "#f0fdf9", borderColor: "#99f6e4" }}>
+          <p className="text-xs" style={{ color: "#065f46", fontFamily: "var(--font-mono)" }}>
             {t(language, "app.privacy_banner")}
           </p>
         </div>
+
+        <div className="border-t" style={{ borderColor: "rgba(100,116,139,0.12)" }}>
+          <div className="max-w-lg mx-auto flex">
+            {TAB_IDS.map((id) => {
+              const active = activeTab === id;
+              return (
+                <motion.button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex-1 py-3 text-sm font-medium transition-colors border-b-2"
+                  style={{ fontFamily: "var(--font-body)", borderBottomColor: active ? "var(--accent)" : "transparent", color: active ? "var(--accent)" : "var(--muted)", background: "transparent", minHeight: "44px" }}
+                >
+                  {t(language, `app.tab.${id}`)}
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
       </header>
 
-      <div className="bg-white border-b border-gray-200 sticky top-[73px] z-10">
-        <div className="max-w-lg mx-auto flex">
-          {TAB_IDS.map((id) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`flex-1 py-3 text-sm font-medium transition border-b-2 ${
-                activeTab === id
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {t(language, `app.tab.${id}`)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <main className="max-w-lg mx-auto w-full px-4 py-5 flex-1">
+      <main className="max-w-lg mx-auto w-full px-4 py-6 flex-1">
         {!loaded ? (
-          <div className="text-center text-gray-400 py-10">{t(language, "app.loading")}</div>
-        ) : activeTab === "body" ? (
-          <AnalyzeBody language={language} profile={profile} />
-        ) : activeTab === "label" ? (
-          <AnalyzeLabel language={language} profile={profile} />
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }} />
+            <p style={{ color: "var(--muted)", fontFamily: "var(--font-body)" }}>{t(language, "app.loading")}</p>
+          </div>
         ) : (
-          <Profile
-            language={language}
-            profile={profile}
-            updateProfile={updateProfile}
-            clearProfile={clearProfile}
-          />
+          <AnimatePresence mode="wait">
+            <motion.div key={activeTab} variants={pageVariants} initial="hidden" animate="visible">
+              {activeTab === "body" ? (
+                <AnalyzeBody language={language} profile={profile} />
+              ) : activeTab === "label" ? (
+                <AnalyzeLabel language={language} profile={profile} />
+              ) : (
+                <Profile language={language} profile={profile} updateProfile={updateProfile} clearProfile={clearProfile} />
+              )}
+            </motion.div>
+          </AnimatePresence>
         )}
       </main>
 
-      <footer className="bg-white border-t border-gray-200 py-3 px-4 text-center">
-        <p className="text-xs text-gray-400">
+      <footer className="py-4 px-4 text-center border-t" style={{ background: "var(--surface)", borderColor: "rgba(100,116,139,0.12)" }}>
+        <p className="text-xs" style={{ color: "var(--muted)", fontFamily: "var(--font-mono)" }}>
           {t(language, "app.footer")}
         </p>
       </footer>

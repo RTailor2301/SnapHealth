@@ -4,7 +4,7 @@ const translations = {
     "app.tab.body": "🩺 Symptom",
     "app.tab.label": "💊 Med Label",
     "app.tab.profile": "👤 Profile",
-    "app.privacy_banner": "🔒 Your photos are never saved. Everything is deleted when you close this session.",
+    "app.privacy_banner": "Your photos are never saved. Everything is deleted when you close this session.",
     "app.loading": "Loading...",
     "app.footer": "This is not medical advice. Always consult a healthcare professional for diagnosis and treatment.",
 
