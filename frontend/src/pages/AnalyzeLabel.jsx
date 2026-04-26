@@ -6,6 +6,7 @@ import ChatWindow from "../components/ChatWindow";
 import MicButton from "../components/MicButton";
 import SpeakButton from "../components/SpeakButton";
 import { analyzeLabel } from "../services/api";
+import { t } from "../i18n";
 
 function buildSpeechText(result) {
   const parts = [result.plain_explanation];
@@ -55,7 +56,7 @@ export default function AnalyzeLabel({ language, profile }) {
       });
       setResult(data);
     } catch {
-      setError("Unable to reach the analysis service.");
+      setError(t(language, "label.error"));
     } finally {
       setLoading(false);
     }
@@ -65,7 +66,7 @@ export default function AnalyzeLabel({ language, profile }) {
     ? [
         {
           role: "user",
-          content: description || "Please decode this medication label",
+          content: description || t(language, "label.default_user_message"),
         },
         { role: "assistant", content: result.plain_explanation },
       ]
@@ -75,10 +76,11 @@ export default function AnalyzeLabel({ language, profile }) {
     <div className="space-y-5">
       <div>
         <p className="text-xs text-gray-500 mb-2">
-          Photo is optional — type your medication question below for a text-only answer.
+          {t(language, "label.photo_optional")}
         </p>
-        <CameraCapture onCapture={setImage} />
+        <CameraCapture language={language} onCapture={setImage} />
       </div>
+
 
       <div className="relative">
         <textarea
@@ -94,10 +96,18 @@ export default function AnalyzeLabel({ language, profile }) {
           className="absolute bottom-2 right-2 w-8 h-8"
         />
       </div>
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder={t(language, "label.placeholder")}
+        rows={3}
+        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+      />
+
 
       <div>
         <p className="text-sm font-semibold text-gray-700 mb-2">
-          Other medications you take (for interaction check):
+          {t(language, "label.other_meds")}
         </p>
         <div className="flex gap-2">
           <input
@@ -105,14 +115,14 @@ export default function AnalyzeLabel({ language, profile }) {
             value={medInput}
             onChange={(e) => setMedInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addMed()}
-            placeholder="e.g. Metformin"
+            placeholder={t(language, "label.med_placeholder")}
             className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={addMed}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm"
           >
-            Add
+            {t(language, "label.add")}
           </button>
         </div>
         {medications.length > 0 && (
@@ -140,17 +150,28 @@ export default function AnalyzeLabel({ language, profile }) {
         disabled={!hasInput || loading}
         className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold disabled:opacity-40 transition"
       >
-        {loading ? "Decoding..." : image ? "Decode Label" : "Ask"}
+        {loading
+          ? t(language, "label.decoding")
+          : image
+          ? t(language, "label.decode")
+          : t(language, "label.ask")}
       </button>
 
       {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
       {result && (
         <div className="space-y-4">
+
           <div className="flex items-center justify-between gap-3">
             <SeverityBadge severity={result.severity} severityLabel={result.severity_label} />
             <SpeakButton text={buildSpeechText(result)} />
           </div>
+
+          <SeverityBadge
+            language={language}
+            severity={result.severity}
+            severityLabel={result.severity_label}
+          />
 
           <div className="bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-700">
             <p>{result.plain_explanation}</p>
@@ -158,7 +179,7 @@ export default function AnalyzeLabel({ language, profile }) {
 
           {result.action_steps?.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-xl p-4 text-sm">
-              <p className="font-semibold text-gray-800 mb-2">Key information:</p>
+              <p className="font-semibold text-gray-800 mb-2">{t(language, "label.key_information")}</p>
               <ul className="space-y-1">
                 {result.action_steps.map((step, i) => (
                   <li key={i} className="flex gap-2 text-gray-700">
@@ -172,7 +193,7 @@ export default function AnalyzeLabel({ language, profile }) {
 
           {result.warning_signs?.length > 0 && (
             <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-sm">
-              <p className="font-semibold text-red-800 mb-2">⚠ Important warnings:</p>
+              <p className="font-semibold text-red-800 mb-2">{t(language, "label.warnings")}</p>
               <ul className="space-y-1">
                 {result.warning_signs.map((sign, i) => (
                   <li key={i} className="text-red-700">• {sign}</li>
@@ -182,6 +203,7 @@ export default function AnalyzeLabel({ language, profile }) {
           )}
 
           <ReasoningAccordion
+            language={language}
             reasoning={result.reasoning_transparency}
             severity={result.severity}
           />
@@ -191,7 +213,7 @@ export default function AnalyzeLabel({ language, profile }) {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-700 mb-2">Ask a follow-up:</p>
+            <p className="text-sm font-semibold text-gray-700 mb-2">{t(language, "label.followup_label")}</p>
             <ChatWindow
               initialHistory={chatHistory}
               language={language}
