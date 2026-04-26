@@ -5,6 +5,8 @@ const STORAGE_KEY = "snaphealth_profile";
 const DEFAULT_PROFILE = {
   age: "",
   biologicalSex: "",
+  height: "",
+  weight: "",
   knownConditions: [],
   currentMedications: [],
   allergies: [],
