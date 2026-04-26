@@ -4,6 +4,8 @@ from pydantic import BaseModel
 class ProfileContext(BaseModel):
     age: str = ""
     biologicalSex: str = ""
+    heightIn: str = ""
+    weightLbs: str = ""
     knownConditions: list[str] = []
     currentMedications: list[str] = []
     allergies: list[str] = []

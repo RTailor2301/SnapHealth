@@ -7,6 +7,10 @@ def build_profile_context(profile: ProfileContext) -> str:
         parts.append(f"Patient age: {profile.age}")
     if profile.biologicalSex:
         parts.append(f"Biological sex: {profile.biologicalSex}")
+    if profile.heightIn:
+        parts.append(f"Height: {profile.heightIn} in")
+    if profile.weightLbs:
+        parts.append(f"Weight: {profile.weightLbs} lbs")
     if profile.knownConditions:
         conditions = ", ".join(profile.knownConditions[:8])
         parts.append(f"Known conditions: {conditions}")
