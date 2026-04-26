@@ -17,7 +17,7 @@ class Message(BaseModel):
 
 
 class AnalyzeBodyRequest(BaseModel):
-    image: str
+    image: str = ""
     description: str = ""
     language: str = "en"
     history: list[Message] = []
@@ -25,7 +25,7 @@ class AnalyzeBodyRequest(BaseModel):
 
 
 class AnalyzeLabelRequest(BaseModel):
-    image: str
+    image: str = ""
     medications: list[str] = []
     language: str = "en"
     history: list[Message] = []
