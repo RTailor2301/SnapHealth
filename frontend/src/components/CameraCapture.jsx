@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
+import { motion } from "framer-motion";
 import Webcam from "react-webcam";
 import { t } from "../i18n";
+import { safeSpring } from "../motion";
 
 function resizeBase64(dataUrl, maxWidth = 800) {
   return new Promise((resolve) => {
@@ -11,7 +13,6 @@ function resizeBase64(dataUrl, maxWidth = 800) {
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
       canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      // Strip the data:image/jpeg;base64, prefix
       const base64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
       resolve(base64);
     };
@@ -19,11 +20,27 @@ function resizeBase64(dataUrl, maxWidth = 800) {
   });
 }
 
+const tabStyle = (active) => ({
+  flex: 1,
+  padding: "10px 0",
+  fontSize: "var(--text-sm)",
+  fontFamily: "var(--font-body)",
+  fontWeight: 500,
+  border: "1px solid",
+  borderColor: active ? "var(--accent)" : "rgba(100,116,139,0.3)",
+  borderRadius: "var(--radius-md)",
+  background: active ? "var(--accent)" : "var(--surface)",
+  color: active ? "#fff" : "var(--muted)",
+  cursor: "pointer",
+  minHeight: "44px",
+  transition: "all 0.15s ease",
+});
+
 export default function CameraCapture({ language, onCapture }) {
   const webcamRef = useRef(null);
   const fileRef = useRef(null);
   const [preview, setPreview] = useState(null);
-  const [mode, setMode] = useState("camera"); // "camera" | "file"
+  const [mode, setMode] = useState("camera");
 
   async function handleWebcamCapture() {
     const screenshot = webcamRef.current?.getScreenshot();
@@ -36,8 +53,6 @@ export default function CameraCapture({ language, onCapture }) {
   async function handleFileChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Convert HEIC/any format to JPEG via canvas
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = async () => {
@@ -58,24 +73,10 @@ export default function CameraCapture({ language, onCapture }) {
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
-        <button
-          onClick={() => setMode("camera")}
-          className={`flex-1 py-2 text-sm rounded-lg border transition ${
-            mode === "camera"
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-white text-gray-600 border-gray-200"
-          }`}
-        >
+        <button onClick={() => setMode("camera")} style={tabStyle(mode === "camera")}>
           {t(language, "camera.tab_camera")}
         </button>
-        <button
-          onClick={() => setMode("file")}
-          className={`flex-1 py-2 text-sm rounded-lg border transition ${
-            mode === "file"
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-white text-gray-600 border-gray-200"
-          }`}
-        >
+        <button onClick={() => setMode("file")} style={tabStyle(mode === "file")}>
           {t(language, "camera.tab_file")}
         </button>
       </div>
@@ -85,41 +86,44 @@ export default function CameraCapture({ language, onCapture }) {
           <Webcam
             ref={webcamRef}
             screenshotFormat="image/jpeg"
-            className="w-full rounded-xl"
+            className="w-full"
+            style={{ borderRadius: "var(--radius-lg)" }}
             videoConstraints={{ facingMode: "environment" }}
           />
-          <button
+          <motion.button
             onClick={handleWebcamCapture}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition"
+            whileHover={{ boxShadow: "var(--shadow-accent)", scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            transition={safeSpring}
+            className="w-full font-medium text-white"
+            style={{ background: "var(--accent)", borderRadius: "var(--radius-md)", padding: "12px 0", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", minHeight: "44px", border: "none", cursor: "pointer" }}
           >
             {t(language, "camera.capture")}
-          </button>
+          </motion.button>
         </div>
       )}
 
       {mode === "file" && (
         <div>
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            ref={fileRef}
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          <button
+          <input type="file" accept="image/*" capture="environment" ref={fileRef} onChange={handleFileChange} className="hidden" />
+          <motion.button
             onClick={() => fileRef.current?.click()}
-            className="w-full border-2 border-dashed border-gray-300 rounded-xl py-8 text-gray-500 hover:border-blue-400 hover:text-blue-500 transition text-sm"
+            whileHover={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+            transition={safeSpring}
+            className="w-full border-2 border-dashed py-8 text-sm transition-colors"
+            style={{ borderColor: "rgba(100,116,139,0.4)", color: "var(--muted)", borderRadius: "var(--radius-lg)", fontFamily: "var(--font-body)", background: "transparent", cursor: "pointer", minHeight: "44px" }}
           >
             {t(language, "camera.tap_to_choose")}
-          </button>
+          </motion.button>
         </div>
       )}
 
       {preview && (
         <div>
-          <p className="text-xs text-gray-500 mb-1">{t(language, "camera.preview")}</p>
-          <img src={preview} alt="Captured" className="w-full rounded-xl max-h-48 object-cover" />
+          <p className="text-xs mb-1" style={{ color: "var(--muted)", fontFamily: "var(--font-mono)" }}>
+            {t(language, "camera.preview")}
+          </p>
+          <img src={preview} alt="Captured preview" className="w-full object-cover" style={{ borderRadius: "var(--radius-lg)", maxHeight: "12rem" }} />
         </div>
       )}
     </div>
