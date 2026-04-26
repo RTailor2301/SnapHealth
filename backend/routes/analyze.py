@@ -9,8 +9,8 @@ router = APIRouter()
 
 @router.post("/analyze/body")
 async def analyze_body_route(req: AnalyzeBodyRequest):
-    if not req.image:
-        raise HTTPException(status_code=400, detail="Image is required")
+    if not req.image and not req.description:
+        raise HTTPException(status_code=400, detail="Either an image or a description is required")
 
     profile_ctx = build_profile_context(req.profile)
     history = [{"role": m.role, "content": m.content} for m in req.history]
@@ -27,8 +27,8 @@ async def analyze_body_route(req: AnalyzeBodyRequest):
 
 @router.post("/analyze/label")
 async def analyze_label_route(req: AnalyzeLabelRequest):
-    if not req.image:
-        raise HTTPException(status_code=400, detail="Image is required")
+    if not req.image and not req.medications:
+        raise HTTPException(status_code=400, detail="Either an image or medications list is required")
 
     profile_ctx = build_profile_context(req.profile)
     history = [{"role": m.role, "content": m.content} for m in req.history]
