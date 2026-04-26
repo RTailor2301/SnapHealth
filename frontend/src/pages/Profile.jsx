@@ -105,6 +105,8 @@ export default function Profile({ language, profile, updateProfile, clearProfile
       <motion.div variants={itemVariants} className="p-3" style={{ background: "#f0fdf9", border: "1px solid #99f6e4", borderLeft: "3px solid var(--accent)", borderRadius: "var(--radius-lg)" }}>
         <p style={{ color: "#065f46", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", lineHeight: 1.6 }}>
           {t(language, "profile.privacy_banner_pre")}
+          <strong>{t(language, "profile.privacy_banner_optional")}</strong>
+          {t(language, "profile.privacy_banner_mid")}
           <strong>{t(language, "profile.privacy_banner_strong")}</strong>
           {t(language, "profile.privacy_banner_post")}
         </p>

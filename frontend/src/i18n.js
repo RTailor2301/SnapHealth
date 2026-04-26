@@ -1,9 +1,9 @@
 const translations = {
   en: {
     "app.tagline": "Health literacy & triage",
-    "app.tab.body": "🩺 Symptom",
-    "app.tab.label": "💊 Med Label",
-    "app.tab.profile": "👤 Profile",
+    "app.tab.body": "Symptoms",
+    "app.tab.label": "Med Label",
+    "app.tab.profile": "Profile",
     "app.privacy_banner": "Your photos are never saved. Everything is deleted when you close this session.",
     "app.loading": "Loading...",
     "app.footer": "This is not medical advice. Always consult a healthcare professional for diagnosis and treatment.",
@@ -41,7 +41,9 @@ const translations = {
     "label.followup_label": "Ask a follow-up:",
     "label.default_user_message": "Please decode this medication label",
 
-    "profile.privacy_banner_pre": "🔒 This information is stored ",
+    "profile.privacy_banner_pre": "This information is ",
+    "profile.privacy_banner_optional": "completely optional",
+    "profile.privacy_banner_mid": " and stored ",
     "profile.privacy_banner_strong": "only on this device",
     "profile.privacy_banner_post": " and is never uploaded to our servers. It is only included in an analysis request when you tap Analyze.",
     "profile.age": "Age",
@@ -78,15 +80,15 @@ const translations = {
     "chat.thinking": "Thinking...",
     "chat.error": "I'm having trouble responding right now. If this is urgent, please seek care or call 911.",
 
-    "camera.tab_camera": "📷 Camera",
-    "camera.tab_file": "🖼 Upload Photo",
-    "camera.capture": "📸 Capture",
+    "camera.tab_camera": "Camera",
+    "camera.tab_file": "Upload Photo",
+    "camera.capture": "Capture",
     "camera.tap_to_choose": "Tap to choose or take a photo",
     "camera.preview": "Preview:",
 
-    "doctors_note.script_title": "📋 What to say when you arrive:",
+    "doctors_note.script_title": "What to say when you arrive:",
     "doctors_note.script_hint": "You can read this directly to the clinician.",
-    "doctors_note.followup_title": "🕐 Watch for in the next 24 hours:",
+    "doctors_note.followup_title": "Watch for in the next 24 hours:",
 
     "reasoning.why_green": "Why is this green?",
     "reasoning.why_yellow": "Why is this yellow?",
@@ -103,10 +105,10 @@ const translations = {
   },
   es: {
     "app.tagline": "Educación sanitaria y triaje",
-    "app.tab.body": "🩺 Síntomas",
-    "app.tab.label": "💊 Etiqueta",
-    "app.tab.profile": "👤 Perfil",
-    "app.privacy_banner": "🔒 Tus fotos nunca se guardan. Todo se elimina cuando cierras esta sesión.",
+    "app.tab.body": "Síntomas",
+    "app.tab.label": "Etiqueta",
+    "app.tab.profile": "Perfil",
+    "app.privacy_banner": "Tus fotos nunca se guardan. Todo se elimina cuando cierras esta sesión.",
     "app.loading": "Cargando...",
     "app.footer": "Esto no es consejo médico. Consulta siempre a un profesional de la salud para el diagnóstico y tratamiento.",
 
@@ -143,7 +145,7 @@ const translations = {
     "label.followup_label": "Haz una pregunta de seguimiento:",
     "label.default_user_message": "Por favor descifra esta etiqueta de medicamento",
 
-    "profile.privacy_banner_pre": "🔒 Esta información se guarda ",
+    "profile.privacy_banner_pre": "Esta información se guarda ",
     "profile.privacy_banner_strong": "solo en este dispositivo",
     "profile.privacy_banner_post": " y nunca se sube a nuestros servidores. Solo se incluye en una solicitud de análisis cuando tocas Analizar.",
     "profile.age": "Edad",
@@ -180,15 +182,15 @@ const translations = {
     "chat.thinking": "Pensando...",
     "chat.error": "Tengo problemas para responder en este momento. Si es urgente, busca atención médica o llama al 911.",
 
-    "camera.tab_camera": "📷 Cámara",
-    "camera.tab_file": "🖼 Subir foto",
-    "camera.capture": "📸 Capturar",
+    "camera.tab_camera": "Cámara",
+    "camera.tab_file": "Subir foto",
+    "camera.capture": "Capturar",
     "camera.tap_to_choose": "Toca para elegir o tomar una foto",
     "camera.preview": "Vista previa:",
 
-    "doctors_note.script_title": "📋 Qué decir cuando llegues:",
+    "doctors_note.script_title": "Qué decir cuando llegues:",
     "doctors_note.script_hint": "Puedes leer esto directamente al personal médico.",
-    "doctors_note.followup_title": "🕐 Vigila durante las próximas 24 horas:",
+    "doctors_note.followup_title": "Vigila durante las próximas 24 horas:",
 
     "reasoning.why_green": "¿Por qué es verde?",
     "reasoning.why_yellow": "¿Por qué es amarillo?",
