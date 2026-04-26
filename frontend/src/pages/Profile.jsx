@@ -86,7 +86,7 @@ export default function Profile({ profile, updateProfile, clearProfile }) {
             type="number"
             placeholder="Enter height in inches"
             value={profile.height}
-            onChange={(e) => updateProfile({ age: height.target.value })}
+            onChange={(e) => updateProfile({ height: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -98,7 +98,7 @@ export default function Profile({ profile, updateProfile, clearProfile }) {
             type="number"
             placeholder="Enter weight in pounds"
             value={profile.weight}
-            onChange={(e) => updateProfile({ weight: height.target.value })}
+            onChange={(e) => updateProfile({ weight: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
