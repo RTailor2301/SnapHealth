@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { sendChat } from "../services/api";
+import { t } from "../i18n";
 
 export default function ChatWindow({ initialHistory, language, profile, disabled }) {
   const [messages, setMessages] = useState(initialHistory || []);
@@ -34,7 +35,7 @@ export default function ChatWindow({ initialHistory, language, profile, disabled
         ...updated,
         {
           role: "assistant",
-          content: "I'm having trouble responding right now. If this is urgent, please seek care or call 911.",
+          content: t(language, "chat.error"),
         },
       ]);
     } finally {
@@ -59,7 +60,7 @@ export default function ChatWindow({ initialHistory, language, profile, disabled
         ))}
         {loading && (
           <div className="mr-auto bg-white border border-gray-200 text-gray-400 text-sm rounded-lg px-3 py-2 animate-pulse">
-            Thinking...
+            {t(language, "chat.thinking")}
           </div>
         )}
         <div ref={bottomRef} />
@@ -71,7 +72,7 @@ export default function ChatWindow({ initialHistory, language, profile, disabled
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder={disabled ? "Emergency — call 911 now" : "Ask a follow-up question..."}
+          placeholder={disabled ? t(language, "chat.disabled_placeholder") : t(language, "chat.placeholder")}
           disabled={disabled}
           className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
         />
@@ -80,7 +81,7 @@ export default function ChatWindow({ initialHistory, language, profile, disabled
           disabled={loading || disabled || !input.trim()}
           className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded-lg disabled:opacity-40 transition"
         >
-          Send
+          {t(language, "chat.send")}
         </button>
       </div>
     </div>

@@ -5,6 +5,7 @@ import ReasoningAccordion from "../components/ReasoningAccordion";
 import DoctorsNoteCard from "../components/DoctorsNoteCard";
 import ChatWindow from "../components/ChatWindow";
 import { analyzeBody } from "../services/api";
+import { t } from "../i18n";
 
 const CRISIS_KEYWORDS = ["hurt myself", "self harm", "cut myself", "suicide", "kill myself"];
 
@@ -36,7 +37,7 @@ export default function AnalyzeBody({ language, profile }) {
       });
       setResult(data);
     } catch {
-      setError("Unable to reach the analysis service. Please check your connection.");
+      setError(t(language, "body.error"));
     } finally {
       setLoading(false);
     }
@@ -46,7 +47,7 @@ export default function AnalyzeBody({ language, profile }) {
     ? [
         {
           role: "user",
-          content: description || "Please analyze this image",
+          content: description || t(language, "body.default_user_message"),
         },
         {
           role: "assistant",
@@ -58,31 +59,31 @@ export default function AnalyzeBody({ language, profile }) {
   return (
     <div className="space-y-5">
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-        <strong>AI Limitation:</strong> Skin analysis is less reliable on darker skin tones.
-        If in doubt, always seek in-person evaluation regardless of the result shown.
+        <strong>{t(language, "body.ai_limitation_label")}</strong> {t(language, "body.ai_limitation")}
       </div>
 
       <div>
         <p className="text-xs text-gray-500 mb-2">
-          Photo is optional — describe your symptoms below for a text-only analysis.
+          {t(language, "body.photo_optional")}
         </p>
-        <CameraCapture onCapture={setImage} />
+        <CameraCapture language={language} onCapture={setImage} />
       </div>
 
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        placeholder="Describe your symptoms (or ask a question)..."
+        placeholder={t(language, "body.symptoms_placeholder")}
         rows={3}
         className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
       />
 
       {isCrisis && (
         <div className="bg-purple-50 border border-purple-300 rounded-xl p-4 text-sm text-purple-900">
-          <p className="font-semibold mb-1">We're concerned about you.</p>
+          <p className="font-semibold mb-1">{t(language, "body.crisis_title")}</p>
           <p>
-            Please contact the{" "}
-            <strong>988 Suicide & Crisis Lifeline</strong> — call or text{" "}
+            {t(language, "body.crisis_body_pre")}
+            <strong>{t(language, "body.crisis_lifeline")}</strong>
+            {t(language, "body.crisis_body_post")}
             <strong>988</strong>.
           </p>
         </div>
@@ -94,7 +95,7 @@ export default function AnalyzeBody({ language, profile }) {
           disabled={!hasInput || loading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold disabled:opacity-40 transition"
         >
-          {loading ? "Analyzing..." : "Analyze"}
+          {loading ? t(language, "body.analyzing") : t(language, "body.analyze")}
         </button>
       )}
 
@@ -105,20 +106,24 @@ export default function AnalyzeBody({ language, profile }) {
       {isEmergency && (
         <div className="bg-black rounded-xl p-5 text-white text-center space-y-3">
           <p className="text-4xl">🚨</p>
-          <p className="text-xl font-bold">Call 911 Now</p>
+          <p className="text-xl font-bold">{t(language, "body.call_911_now")}</p>
           <p className="text-sm opacity-80">{result.plain_explanation}</p>
           <a
             href="tel:911"
             className="inline-block bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold"
           >
-            Tap to Call 911
+            {t(language, "body.call_911_button")}
           </a>
         </div>
       )}
 
       {result && !isEmergency && (
         <div className="space-y-4">
-          <SeverityBadge severity={result.severity} severityLabel={result.severity_label} />
+          <SeverityBadge
+            language={language}
+            severity={result.severity}
+            severityLabel={result.severity_label}
+          />
 
           <div className="bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-700">
             <p>{result.plain_explanation}</p>
@@ -126,14 +131,14 @@ export default function AnalyzeBody({ language, profile }) {
 
           {result.recommendation_reasoning && (
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm">
-              <p className="font-semibold text-gray-800 mb-1">Recommendation:</p>
+              <p className="font-semibold text-gray-800 mb-1">{t(language, "body.recommendation")}</p>
               <p className="text-gray-700">{result.recommendation_reasoning}</p>
             </div>
           )}
 
           {result.action_steps?.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-xl p-4 text-sm">
-              <p className="font-semibold text-gray-800 mb-2">Action Steps:</p>
+              <p className="font-semibold text-gray-800 mb-2">{t(language, "body.action_steps")}</p>
               <ul className="space-y-1">
                 {result.action_steps.map((step, i) => (
                   <li key={i} className="flex gap-2 text-gray-700">
@@ -147,7 +152,7 @@ export default function AnalyzeBody({ language, profile }) {
 
           {result.warning_signs?.length > 0 && (
             <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-sm">
-              <p className="font-semibold text-red-800 mb-2">⚠ Seek care immediately if:</p>
+              <p className="font-semibold text-red-800 mb-2">{t(language, "body.warning_signs")}</p>
               <ul className="space-y-1">
                 {result.warning_signs.map((sign, i) => (
                   <li key={i} className="flex gap-2 text-red-700">
@@ -160,11 +165,13 @@ export default function AnalyzeBody({ language, profile }) {
           )}
 
           <ReasoningAccordion
+            language={language}
             reasoning={result.reasoning_transparency}
             severity={result.severity}
           />
 
           <DoctorsNoteCard
+            language={language}
             script={result.what_to_say_when_you_arrive}
             followupPrompt={result.followup_prompt}
           />
@@ -174,7 +181,7 @@ export default function AnalyzeBody({ language, profile }) {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-700 mb-2">Ask a follow-up:</p>
+            <p className="text-sm font-semibold text-gray-700 mb-2">{t(language, "body.followup_label")}</p>
             <ChatWindow
               initialHistory={chatHistory}
               language={language}

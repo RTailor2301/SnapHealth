@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import Webcam from "react-webcam";
+import { t } from "../i18n";
 
 function resizeBase64(dataUrl, maxWidth = 800) {
   return new Promise((resolve) => {
@@ -18,7 +19,7 @@ function resizeBase64(dataUrl, maxWidth = 800) {
   });
 }
 
-export default function CameraCapture({ onCapture }) {
+export default function CameraCapture({ language, onCapture }) {
   const webcamRef = useRef(null);
   const fileRef = useRef(null);
   const [preview, setPreview] = useState(null);
@@ -65,7 +66,7 @@ export default function CameraCapture({ onCapture }) {
               : "bg-white text-gray-600 border-gray-200"
           }`}
         >
-          📷 Camera
+          {t(language, "camera.tab_camera")}
         </button>
         <button
           onClick={() => setMode("file")}
@@ -75,7 +76,7 @@ export default function CameraCapture({ onCapture }) {
               : "bg-white text-gray-600 border-gray-200"
           }`}
         >
-          🖼 Upload Photo
+          {t(language, "camera.tab_file")}
         </button>
       </div>
 
@@ -91,7 +92,7 @@ export default function CameraCapture({ onCapture }) {
             onClick={handleWebcamCapture}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition"
           >
-            📸 Capture
+            {t(language, "camera.capture")}
           </button>
         </div>
       )}
@@ -110,14 +111,14 @@ export default function CameraCapture({ onCapture }) {
             onClick={() => fileRef.current?.click()}
             className="w-full border-2 border-dashed border-gray-300 rounded-xl py-8 text-gray-500 hover:border-blue-400 hover:text-blue-500 transition text-sm"
           >
-            Tap to choose or take a photo
+            {t(language, "camera.tap_to_choose")}
           </button>
         </div>
       )}
 
       {preview && (
         <div>
-          <p className="text-xs text-gray-500 mb-1">Preview:</p>
+          <p className="text-xs text-gray-500 mb-1">{t(language, "camera.preview")}</p>
           <img src={preview} alt="Captured" className="w-full rounded-xl max-h-48 object-cover" />
         </div>
       )}

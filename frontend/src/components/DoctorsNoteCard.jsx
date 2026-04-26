@@ -1,4 +1,6 @@
-export default function DoctorsNoteCard({ script, followupPrompt }) {
+import { t } from "../i18n";
+
+export default function DoctorsNoteCard({ language, script, followupPrompt }) {
   if (!script && !followupPrompt) return null;
 
   return (
@@ -6,11 +8,11 @@ export default function DoctorsNoteCard({ script, followupPrompt }) {
       {script && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm font-semibold text-blue-800 mb-2">
-            📋 What to say when you arrive:
+            {t(language, "doctors_note.script_title")}
           </p>
           <p className="text-sm text-blue-900 italic">"{script}"</p>
           <p className="text-xs text-blue-600 mt-2">
-            You can read this directly to the clinician.
+            {t(language, "doctors_note.script_hint")}
           </p>
         </div>
       )}
@@ -18,7 +20,7 @@ export default function DoctorsNoteCard({ script, followupPrompt }) {
       {followupPrompt && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
           <p className="text-sm font-semibold text-amber-800 mb-2">
-            🕐 Watch for in the next 24 hours:
+            {t(language, "doctors_note.followup_title")}
           </p>
           <p className="text-sm text-amber-900">{followupPrompt}</p>
         </div>
