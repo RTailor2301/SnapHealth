@@ -1,14 +1,18 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from models import AnalyzeBodyRequest, AnalyzeLabelRequest
 from services.claude import analyze_body, analyze_label
 from services.profile_context import build_profile_context
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/analyze/body")
-async def analyze_body_route(req: AnalyzeBodyRequest):
+@limiter.limit("3/minute")
+async def analyze_body_route(request: Request, req: AnalyzeBodyRequest):
     if not req.image and not req.description:
         raise HTTPException(status_code=400, detail="Either an image or a description is required")
 
@@ -26,7 +30,8 @@ async def analyze_body_route(req: AnalyzeBodyRequest):
 
 
 @router.post("/analyze/label")
-async def analyze_label_route(req: AnalyzeLabelRequest):
+@limiter.limit("3/minute")
+async def analyze_label_route(request: Request, req: AnalyzeLabelRequest):
     if not req.image and not req.medications:
         raise HTTPException(status_code=400, detail="Either an image or medications list is required")
 
