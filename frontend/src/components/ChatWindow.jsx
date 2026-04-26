@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { sendChat } from "../services/api";
+import MicButton from "./MicButton";
+import SpeakButton from "./SpeakButton";
 
 export default function ChatWindow({ initialHistory, language, profile, disabled }) {
   const [messages, setMessages] = useState(initialHistory || []);
@@ -55,6 +57,11 @@ export default function ChatWindow({ initialHistory, language, profile, disabled
             }`}
           >
             {m.content}
+            {m.role === "assistant" && (
+              <div className="mt-1">
+                <SpeakButton text={m.content} />
+              </div>
+            )}
           </div>
         ))}
         {loading && (
@@ -74,6 +81,10 @@ export default function ChatWindow({ initialHistory, language, profile, disabled
           placeholder={disabled ? "Emergency — call 911 now" : "Ask a follow-up question..."}
           disabled={disabled}
           className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+        />
+        <MicButton
+          onTranscript={(t) => setInput(t)}
+          className="w-8 h-8 shrink-0"
         />
         <button
           onClick={handleSend}
