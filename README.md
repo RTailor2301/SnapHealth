@@ -12,9 +12,17 @@ SnapHealth puts a knowledgeable and calm first voice in the room. Users can desc
 
 ## Screenshots
 
-| Symptom Analysis | Medication Decoder | Follow-up Chat |
-|---|---|---|
-| *(screenshot)* | *(screenshot)* | *(screenshot)* |
+**Symptom Analysis**
+![Symptoms Page](media/symptoms.png)
+
+**Med Label Analysis**
+![Medicine Label Analysis](media/med_label.png)
+
+**Profile**
+![Profile Page](media/profile.png)
+
+**Example Output**
+![Example Output](media/example_output.png)
 
 ## Flow
 
