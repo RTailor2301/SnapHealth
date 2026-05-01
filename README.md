@@ -1,6 +1,8 @@
 # SnapHealth
 **Anthropic Claude Builder Club Hackathon Spring 2026 Project**  
-**Developers: Roshan Tailor, Saaket Kulkarni, Frederick Rajakumar**
+**Developers: Roshan Tailor, Saaket Kulkarni, Frederick Rajakumar**  
+
+Visit our app: https://snaphealth.vercel.app/
 
 An AI-powered health literacy and triage tool for people who don't have easy access to medical guidance.
 
@@ -58,6 +60,7 @@ SnapHealth puts a knowledgeable and calm first voice in the room. Users can desc
 | AI | Anthropic Claude (claude-sonnet-4-5) with vision |
 | Rate limiting | slowapi |
 | Storage | localStorage only |
+| Deployment | Render (Backend), Vercel (Frontend) |
 
 ## Architecture
 
