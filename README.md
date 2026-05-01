@@ -1,4 +1,6 @@
 # SnapHealth
+**Anthropic Claude Builder Club Hackathon Spring 2026 Project**  
+**Developers: Roshan Tailor, Saaket Kulkarni, Frederick Rajakumar**
 
 An AI-powered health literacy and triage tool for people who don't have easy access to medical guidance.
 
